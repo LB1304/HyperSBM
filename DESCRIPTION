@@ -1,0 +1,18 @@
+Package: HyperSBM
+Type: Package
+Title: Stochastic Blockmodel for Hypergraphs
+Version: 1.0
+Date: 2022-08-22
+Authors@R: c(
+  person("Luca", "Brusa", email = "luca.brusa@unimib.it", role = c("cre", "aut")),
+  person("Catherine", "Matias", role = "aut"))
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
+Imports: 
+  Rcpp (>= 1.0.8),
+  RcppParallel (>= 5.1.5), 
+  RcppArmadillo (>= 0.11.0), 
+  RcppAlgos (>= 2.5.3), 
+  ppclust (>= 1.1.0)
+LinkingTo: Rcpp, RcppArmadillo, RcppParallel
+SystemRequirements: GNU make
