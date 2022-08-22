@@ -1,6 +1,6 @@
-<h2 align="center">Stochastic Blockmodel for Hypergraphs</h2>
+<h1 align="center">Tempered Expectation-Maximization algorithm</h1>
 
-<h5 align="center">**Luca Brusa** &middot; **Catherine Matias**</h5>
+<h4 align="center">Luca Brusa &middot; Catherine Matias</h4>
 
 <br>
 
