@@ -1,4 +1,4 @@
-<h1 align="center">Tempered Expectation-Maximization algorithm</h1>
+<h1 align="center">Stochastic Blockmodel for Hypergraphs</h1>
 
 <h4 align="center">Luca Brusa &middot; Catherine Matias</h4>
 
