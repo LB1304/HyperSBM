@@ -1,2 +1,2 @@
 # HyperSBM
- tochastic Blockmodel for Hypergraphs
+ Stochastic Blockmodel for Hypergraphs
