@@ -84,11 +84,11 @@ hSBM_par <- function (Hypergraph, Q, M_max = NULL, start = 0, model = 0, tol = 1
   
   # 5. VEM algorithm
   out <- VEM_par(M = M_max, Q = Q, n = n, tau_old = tau_init, all_latents = all_Latents[1:M_max-1], Y = Y[1:M_max-1], 
-                 tol = tol, maxit_VEM = maxit_VEM, maxit_FP = maxit_FP, model = 0, start = start, print = print, n_threads = n_threads)
+                 tol = tol, maxit_VEM = maxit_VEM, maxit_FP = maxit_FP, model = model, start = start, print = print, n_threads = n_threads)
   Z <- apply(out$tau, 1, which.max)
   out$Z <- Z
   
-  # 6. Additional M-Step
+  # 6. Additional M-Step with complete M_max
   B_complete <- compute_B(n = n, M = M, tau = out$tau, Y = Y, all_latents = all_Latents, model = model, n_threads = n_threads)
   out$B <- B_complete
   pi_complete <- compute_pi(tau = out$tau)
@@ -99,16 +99,16 @@ hSBM_par <- function (Hypergraph, Q, M_max = NULL, start = 0, model = 0, tol = 1
   out$LogLik <- LogLik
   if (model == 0) {
     n_B_par <- choose(Q+(2:M)-1, 2:M)
-    ICL_B_par <- sum(n_B_par * log(choose(n, 2:M)))
+    ICL_B_par <- 1/2 * sum(n_B_par * log(choose(n, 2:M)))
   } else if (model == 1) {
     n_B_par <- 2
-    ICL_B_par <- 2 * sum(log(choose(n, 2:M)))
+    ICL_B_par <- sum(log(choose(n, 2:M)))
   } else if (model == 2) {
     n_B_par <- 2 * (M-1)
-    ICL_B_par <- sum(2 * log(choose(n, 2:M)))
+    ICL_B_par <- (M-1) * sum(log(choose(n, 2:M)))
   }
   out$n_par <- (Q-1) + sum(n_B_par)
-  ICL <- LogLik - 1/2 * (Q-1) * log(n) - 1/2 * ICL_B_par
+  ICL <- LogLik - 1/2 * (Q-1) * log(n) - ICL_B_par
   out$ICL <- ICL
   
   # 8. Output
