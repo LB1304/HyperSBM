@@ -54,7 +54,8 @@ hSBM_par <- function (Hypergraph, Q, M_max = NULL, start = 0, model = 0, tol = 1
     tau_init <- tau_init/rowSums(tau_init)
   } else if (start == 1) {
     X <- as.matrix(eigen(L)$vectors[, (n-Q+1):n])
-    X <- X/rowSums(X)
+    X <- X/sqrt(apply(X, 1, function(x) norm(x, "2")))
+    X[which(is.nan(X))] <- 0
     km <- kmeans(x = X, centers = Q, nstart = 100)
     tau_vec <- km$cluster
     tau_init <- matrix(0, nrow = n, ncol = Q)
@@ -63,7 +64,8 @@ hSBM_par <- function (Hypergraph, Q, M_max = NULL, start = 0, model = 0, tol = 1
     }
   } else if (start == 2) {
     X <- as.matrix(eigen(L)$vectors[, (n-Q+1):n])
-    X <- X/rowSums(X)
+    X <- X/sqrt(apply(X, 1, function(x) norm(x, "2")))
+    X[which(is.nan(X))] <- 0
     f_cm <- ppclust::fcm(x = X, centers = Q, nstart = 100)
     tau_init <- f_cm$u
   } else if (start == 3) {
@@ -73,7 +75,8 @@ hSBM_par <- function (Hypergraph, Q, M_max = NULL, start = 0, model = 0, tol = 1
     Qth_eig_value <- sort(eig_values, partial = Qth)[Qth]
     ind_eig <- which(eig_values > Qth_eig_value)
     X <- as.matrix(eigs$vectors[, ind_eig])
-    X <- X/rowSums(X)
+    X <- X/sqrt(apply(X, 1, function(x) norm(x, "2")))
+    X[which(is.nan(X))] <- 0
     km <- kmeans(x = X, centers = Q)
     tau_vec <- km$cluster
     tau_init <- matrix(0, nrow = n, ncol = Q)
