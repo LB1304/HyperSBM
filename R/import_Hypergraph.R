@@ -1,4 +1,4 @@
-import_hypergraph <- function(file_name, method = c("full", "edge")) {
+import_Hypergraph <- function(file_name, method = c("full", "edge")) {
   if (!file.exists(file_name)) {
     stop("The specified file name does not exist!")
   }
