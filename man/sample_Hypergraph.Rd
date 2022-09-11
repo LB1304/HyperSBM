@@ -1,5 +1,5 @@
-\name{sample_hypergraph}
-\alias{sample_hypergraph}
+\name{sample_Hypergraph}
+\alias{sample_Hypergraph}
 \title{Estimation of Hypergraph SBMs}
 \description{
   This function performs variational inference of hypergraph Stochastic Block Models (HSBMs).
