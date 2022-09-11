@@ -24,6 +24,6 @@ sample_Hypergraph(n, M, Q, pi, alpha, beta, file_name)
 }
 \examples{
   require(HyperSBM)
-  sample_Hypergraph(n = 50, M = 3, pi = c(0.4, 0.6), alpha = 0.7, beta = 0.3, file_name = "HG")
+  sample_Hypergraph(n = 50, M = 3, Q = 2, pi = c(0.4, 0.6), alpha = 0.7, beta = 0.3, file_name = "HG")
 }
 \author{Luca Brusa, Catherine Matias}
