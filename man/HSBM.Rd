@@ -24,25 +24,34 @@ HSBM(Hypergraph, Q, M_max = NULL,
   \item{seed}{An integer value with the random number generator state}
 }
 \value{
-  \item{}{}
-  \item{}{}
-  \item{}{}
-  \item{}{}
-  \item{}{}
-}
-\details{
-  These are example functions which should be largely
-  self-explanatory. Their main benefit is to demonstrate how to write a
-  function using the Armadillo C++ classes, and to have to such a
-  function accessible from R.
-}
-\references{
-  See the documentation for Armadillo, and RcppArmadillo, for more details.
+  \item{Q}{Number of latent groups}
+  \item{B}{Estimate of the probabilities that m unordered nodes with a specific latent configuration are connected into a hyperedge}
+  \item{pi}{Estimate of the priori probability vector}
+  \item{tau}{Matrix of the variational parameters}
+  \item{J}{Value of the evidence lower bound J at convergence}
+  \item{J_vec}{Vector of the evidence lower bound at every step of the algorithm}
+  \item{it}{Number of iterations of the algorithm}
+  \item{Z}{Vector containing the estimated latent group for each node}
+  \item{LogLik}{Value of the log-likelihood at convergence}
+  \item{n_par}{Total number of estimated parameters}
+  \item{ICL}{Value of the ICL}
+  \item{Y}{List containing the index of the existing hyperedges}
+  \item{tau_init}{Matrix of the initial values of the variational parameters}
+  \item{call}{Command used to call the function}
 }
 \examples{
   require(HyperSBM)
-  HG <- 
-  est <- 
+  ## Import the co-authorship dataset
+  HG <- import_hypergraph(file_name = "HG_coauth.txt", method = "full")
+  
+  ## Estimation of the HSBM with 2 latent groups, random initialization and full model (not parallelized version)
+  est <- HSBM(Hypergraph = HG, Q = 2, tol = 1e-6, maxit_VEM = 100, maxit_FP = 100)
+  ## Estimation of the HSBM with 2 latent groups, random initialization and full model (parallelized version with 30 cores)
+  est <- HSBM(Hypergraph = HG, Q = 2, tol = 1e-6, maxit_VEM = 100, maxit_FP = 100, n_threads = 30)
+  ## Estimation of the HSBM with 2 latent groups, random initialization and affiliation model
+  est <- HSBM(Hypergraph = HG, Q = 2, start = 0, model = 2, tol = 1e-6, maxit_VEM = 100, maxit_FP = 100)
+  ## Estimation of the HSBM with 2 latent groups, soft spectral clustering initialization and full model
+  est <- HSBM(Hypergraph = HG, Q = 2, start = 2, model = 0, tol = 1e-6, maxit_VEM = 100, maxit_FP = 100)
 }
 \author{Luca Brusa, Catherine Matias}
 
