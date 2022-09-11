@@ -1,6 +1,6 @@
 # function to calculate the adjusted rand statistic
 # x and y are vectors containing the two partitions to be compared
-randError <- function(x, y) {
+ari_index <- function(x, y) {
   # Get crosstabs
   ctab <- table(x,y);
   
