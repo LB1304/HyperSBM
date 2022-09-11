@@ -13,12 +13,13 @@
 The DESCRIPTION file:
 \packageDESCRIPTION{HyperSBM}
 \packageIndices{HyperSBM}
-~~ An overview of how to use the package, including the most important functions ~~
+  The HyperSBM package contains functions to specify and fit Stochastic Blockmodel for hypergraphs. 
+  It allows performing model-based clustering when the relationship among nodes are not limited to pairwise interactions (edges in graphs), but include higher-order interactions among three or more nodes (hyperedges).
+  The main function relies on a variational implementation of the expectation-maximization algorithm to perform model parameters and latent groups estimation. 
+  It also provides tools for generating hypergraphs according to a simplified latent structure (affiliation sub-model).
 }
 \author{
-\packageAuthor{HyperSBM}
-
-Maintainer: \packageMaintainer{HyperSBM}
+  Luca Brusa, Catherine Matias
 }
 \references{
 ~~ Literature or other references for background information ~~
@@ -29,7 +30,4 @@ Maintainer: \packageMaintainer{HyperSBM}
 \seealso{
 ~~ Optional links to other man pages, e.g. ~~
 ~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-}
-\examples{
-~~ simple examples of the most important functions ~~
 }
