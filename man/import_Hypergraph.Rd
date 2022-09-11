@@ -1,6 +1,6 @@
 \name{import_Hypergraph}
 \alias{import_Hypergraph}
-\title{Import Hypergraphs}
+\title{Import hypergraphs}
 \description{
   This function imports the hyperedges from a text file and constructs the corresponding hypergraph.
 }
