@@ -42,7 +42,7 @@ HSBM(Hypergraph, Q, M_max = NULL,
 \examples{
   require(HyperSBM)
   ## Import the co-authorship dataset
-  HG <- import_hypergraph(file_name = "HG_coauth.txt", method = "full")
+  HG <- import_Hypergraph(file_name = "HG_coauth.txt", method = "full")
   
   ## Estimation of the HSBM with 2 latent groups, random initialization and full model (not parallelized version)
   est <- HSBM(Hypergraph = HG, Q = 2, tol = 1e-6, maxit_VEM = 100, maxit_FP = 100)
