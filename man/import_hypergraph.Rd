@@ -1,6 +1,6 @@
-\name{import_hypergraph}
-\alias{import_hypergraph}
-\title{Import hypergraphs}
+\name{import_Hypergraph}
+\alias{import_Hypergraph}
+\title{Import Hypergraphs}
 \description{
   This function imports the hyperedges from a text file and constructs the corresponding hypergraph.
 }
@@ -30,9 +30,9 @@ import_hypergraph(file_name, method = c("full", "edge"))
 \examples{
   require(HyperSBM)
   ## Import the co-authorship dataset, computing the full Laplacian matrix
-  HG <- import_hypergraph(file_name = "HG_coauth.txt", method = "full")
+  HG <- import_Hypergraph(file_name = "HG_coauth.txt", method = "full")
   
   ## Import the co-authorship dataset, computing the edge-component Laplacian matrix
-  HG <- import_hypergraph(file_name = "HG_coauth.txt", method = "edge")
+  HG <- import_Hypergraph(file_name = "HG_coauth.txt", method = "edge")
 }
 \author{Luca Brusa, Catherine Matias}
