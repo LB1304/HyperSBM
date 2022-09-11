@@ -6,7 +6,7 @@ Date: 2022-08-22
 Authors@R: c(
   person("Luca", "Brusa", email = "luca.brusa@unimib.it", role = c("cre", "aut")),
   person("Catherine", "Matias", role = "aut"))
-Description: More about what it does (maybe more than one line)
+Description: The HyperSBM package contains functions to specify and fit Stochastic Blockmodel for hypergraphs. It allows performing model-based clustering when the relationship among nodes are not limited to pairwise interactions (edges in graphs), but include higher-order interactions among three or more nodes (hyperedges). The main function relies on a variational implementation of the expectation-maximization algorithm to perform model parameters and latent groups estimation. It also provides tools for generating hypergraphs according to a simplified latent structure (affiliation sub-model).
 License: What license is it under?
 Imports: 
   Rcpp (>= 1.0.8),
