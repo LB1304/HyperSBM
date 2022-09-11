@@ -2,6 +2,9 @@ import_hypergraph <- function(file_name, method = c("full", "edge")) {
   if (!file.exists(file_name)) {
     stop("The specified file name does not exist!")
   }
+  if (length(method) == 2) {
+    method <- method[1]
+  }
   
   hg <- data.frame(h_edges = unique(readLines(file_name)))
   hg$sizes <- stringr::str_count(hg$h_edges, ",") + 1
