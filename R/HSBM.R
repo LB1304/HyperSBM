@@ -3,7 +3,7 @@
 # start: initialization (0 = random, 1 = spectral clustering, 2 = fuzzy spectral clustering)
 # model: type of model (0 = full model, 1,2 = affiliation models)
 
-hSBM_par <- function (Hypergraph, Q, M_max = NULL, start = 0, model = 0, tol = 1e-6, maxit_VEM = 50, maxit_FP = 40, n_threads = 1, print = TRUE, seed = NULL) {
+HSBM <- function (Hypergraph, Q, M_max = NULL, start = 0, model = 0, tol = 1e-6, maxit_VEM = 50, maxit_FP = 40, n_threads = 1, print = TRUE, seed = NULL) {
   M <- Hypergraph$Max_size
   n <- Hypergraph$Num_nodes
   
