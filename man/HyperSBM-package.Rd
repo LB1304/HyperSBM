@@ -1,9 +1,8 @@
 \name{HyperSBM-package}
 \alias{HyperSBM Package}
-\alias{HyperSBM}
 \docType{package}
 \title{
-\packageTitle{HyperSBM}
+  Overview of the package HyperSBM
 }
 \description{
 \packageDescription{HyperSBM}
