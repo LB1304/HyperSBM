@@ -2,7 +2,7 @@
 \alias{sample_Hypergraph}
 \title{Draw samples from the HSBM}
 \description{
-  This function draws samples (hypergraphs) from the HSBM.
+  This function samples a hypergraph from the affiliation HSBM.
 }
 \usage{
 sample_Hypergraph(n, M, Q, pi, alpha, beta, file_name)
@@ -11,7 +11,7 @@ sample_Hypergraph(n, M, Q, pi, alpha, beta, file_name)
   \item{n}{Number of nodes}
   \item{M}{Maximum size of the hyperedges}
   \item{Q}{Number of latent groups}
-  \item{pi}{Vector of priori probabilities}
+  \item{pi}{Vector of group probabilities}
   \item{alpha}{Probability that nodes in the same latent group are connected into a hyperedge}
   \item{beta}{Probability that nodes in different latent groups are connected into a hyperedge}
   \item{file_name}{A string with the name of the hypergraph}
