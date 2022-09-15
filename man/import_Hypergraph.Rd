@@ -8,7 +8,7 @@
 import_hypergraph(file_name, method = c("full", "edge"))
 }
 \arguments{
-  \item{file_name}{A string with name of the file containing the list of hjperedges.}
+  \item{file_name}{A string with name of the file containing the list of hyperedges.}
   \item{method}{Type of Laplacian computed for the hypergraph: "full" option (default) takes into consideration all the hyperedges, "edge" option only the edges (hyperedges of size 2). The latter could be convenient for computational time purposes.}
 }
 \details{
