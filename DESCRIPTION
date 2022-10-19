@@ -16,3 +16,4 @@ Imports:
   ppclust (>= 1.1.0)
 LinkingTo: Rcpp, RcppArmadillo, RcppParallel
 SystemRequirements: GNU make
+License: GPL-3
