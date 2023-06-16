@@ -11,9 +11,8 @@ HSBM <- function (Hypergraph, Q, M_max = NULL, start = 0, model = 0, tol = 1e-6,
   if (!(start %in% c(0, 1, 2, 3))) {
     stop("A correct initialization method must be provided! (0: random, 1: spectral clustering, 2: fuzzy spectral clustering)")
   }
-  if (!(model %in% c(0, 1))) {
-    stop("A correct model formulation must be provided! (0: full, 1: affiliation)")
-    ## Nota per me: ci sarà da aggiungere m-affiliation submodels
+  if (!(model %in% c(0, 1, 2))) {
+    stop("A correct model formulation must be provided! (0: Full, 1: Aff, 2: Aff-m)")
   }
   if (!is.null(seed)) {
     set.seed(seed)
