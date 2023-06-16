@@ -143,7 +143,7 @@ Rcpp::List compute_Y (int n, int M, Rcpp::List list_edges) {
 }
 
 
-struct compute_B_parallel : public Worker {
+struct B_full : public Worker {
   
   // Input matrix to read from
   const RMatrix<double> all_latents_m_par;
@@ -160,7 +160,7 @@ struct compute_B_parallel : public Worker {
   
   
   // Initialize arguments
-  compute_B_parallel(const NumericMatrix all_latents_m_par, NumericVector B_m_par, int num_all_latents_m, int n, int m, arma::mat tau, arma::uvec Y_m)
+  B_full(const NumericMatrix all_latents_m_par, NumericVector B_m_par, int num_all_latents_m, int n, int m, arma::mat tau, arma::uvec Y_m)
     : all_latents_m_par(all_latents_m_par), B_m_par(B_m_par), num_all_latents_m(num_all_latents_m), n(n), m(m), tau(tau), Y_m(Y_m) {}
   
   // convert RVector/RMatrix into arma type for Rcpp function
@@ -209,7 +209,94 @@ struct compute_B_parallel : public Worker {
   }
 };
 
-struct compute_B_parallel_AFF : public Worker {
+struct B_aff : public Worker {
+  
+  // Input matrix to read from
+  const RVector<double> B_input;
+  // Output matrix to write to
+  RMatrix<double> B_output;
+  // Additional arguments
+  int num_all_latents_m;
+  int n;
+  int m;
+  arma::mat tau;
+  arma::uvec Y_m;
+  arma::imat all_latents_m;
+  arma::uvec intra_or_inter;
+  double num_intra, den_intra, num_inter, den_inter;
+  
+  // Initialize arguments
+  B_aff(const NumericVector B_input, NumericMatrix B_output, int num_all_latents_m, int n, int m, arma::mat tau, arma::uvec Y_m, arma::imat all_latents_m, arma::uvec intra_or_inter, double num_intra, double den_intra, double num_inter, double den_inter)
+    : B_input(B_input), B_output(B_output), num_all_latents_m(num_all_latents_m), n(n), m(m), tau(tau), Y_m(Y_m), all_latents_m(all_latents_m), intra_or_inter(intra_or_inter), num_intra(num_intra), den_intra(den_intra), num_inter(num_inter), den_inter(den_inter) {}
+  
+  // Function call operator that work for the specified range (begin/end)
+  void operator()(std::size_t begin, std::size_t end) {
+    for (std::size_t j = begin; j < end; j++) {
+      arma::rowvec perm = arma::conv_to<arma::rowvec>::from(all_latents_m.row(j));
+      arma::rowvec unique_perm = arma::unique(perm);
+
+      if (unique_perm.n_elem == 1) {         // q1 = ... = qm (intra)
+
+        do {
+          arma::uvec latent_m = arma::conv_to<arma::uvec>::from(perm);
+          int count = 0;
+          arma::rowvec comb = arma::linspace<arma::rowvec>(1, m+2, m+2);
+          do {
+            arma::uvec edge_m = arma::conv_to<arma::uvec>::from(comb);
+            arma::vec tau_elem = tau.elem((latent_m - 1) * tau.n_rows + (edge_m - 1));
+            double new_Tau = arma::prod(tau_elem);
+            den_intra +=new_Tau;
+            if (any((Y_m - count) == 0)) {
+              num_intra +=new_Tau;
+            }
+            count +=1;
+            arma::rowvec new_comb = next_combination(n, comb);
+            comb = new_comb;
+          } while (!comb.has_nan());
+          arma::rowvec new_perm = next_permutation(perm);
+          perm = new_perm;
+        } while (!perm.has_nan());
+
+      } else {            // there exist at least q_j different
+        
+        intra_or_inter[j] = 1;
+        do {
+          arma::uvec latent_m = arma::conv_to<arma::uvec>::from(perm);
+          int count = 0;
+          arma::rowvec comb = arma::linspace<arma::rowvec>(1, m+2, m+2);
+          do {
+            arma::uvec edge_m = arma::conv_to<arma::uvec>::from(comb);
+            arma::vec tau_elem = tau.elem((latent_m - 1) * tau.n_rows + (edge_m - 1));
+            double new_Tau = arma::prod(tau_elem);
+            den_inter +=new_Tau;
+            if (any((Y_m - count) == 0)) {
+              num_inter +=new_Tau;
+            }
+            count +=1;
+            arma::rowvec new_comb = next_combination(n, comb);
+            comb = new_comb;
+          } while (!comb.has_nan());
+          arma::rowvec new_perm = next_permutation(perm);
+          perm = new_perm;
+        } while (!perm.has_nan());
+
+      }
+    }
+    
+    for (int xx = 0; xx < num_all_latents_m; xx++) {
+      if (intra_or_inter[xx] == 0) {
+        B_output(0, xx) = num_intra;
+        B_output(1, xx) = den_intra;
+      } else {
+        B_output(0, xx) = num_inter;
+        B_output(1, xx) = den_inter;
+      }
+    }
+    
+  }
+};
+
+struct B_aff_m : public Worker {
   
   // Input matrix to read from
   const RMatrix<double> all_latents_m_par;
@@ -225,7 +312,7 @@ struct compute_B_parallel_AFF : public Worker {
   double num_intra, den_intra, num_inter, den_inter;
   
   // Initialize arguments
-  compute_B_parallel_AFF(const NumericMatrix all_latents_m_par, NumericVector B_m_par, int num_all_latents_m, int n, int m, arma::mat tau, arma::uvec Y_m, arma::uvec intra_or_inter, double num_intra, double den_intra, double num_inter, double den_inter)
+  B_aff_m(const NumericMatrix all_latents_m_par, NumericVector B_m_par, int num_all_latents_m, int n, int m, arma::mat tau, arma::uvec Y_m, arma::uvec intra_or_inter, double num_intra, double den_intra, double num_inter, double den_inter)
     : all_latents_m_par(all_latents_m_par), B_m_par(B_m_par), num_all_latents_m(num_all_latents_m), n(n), m(m), tau(tau), Y_m(Y_m), intra_or_inter(intra_or_inter), num_intra(num_intra), den_intra(den_intra), num_inter(num_inter), den_inter(den_inter) {}
   
   // Convert RVector/RMatrix into arma type
@@ -264,7 +351,7 @@ struct compute_B_parallel_AFF : public Worker {
           perm = new_perm;
         } while (!perm.has_nan());
         
-      } else {            // exist at least q_j different
+      } else {            // there exist at least q_j different
         
         intra_or_inter[j] = 1;
         do {
@@ -316,24 +403,70 @@ Rcpp::List compute_B (int n, int M, arma::mat tau, Rcpp::List Y, Rcpp::List all_
         
         // Converto da arma::mat a Rcpp::NumericMatrix
         NumericMatrix transformed_input = as<NumericMatrix>(wrap(all_latents_m));
-        
         // Allocate the matrix we will return
         NumericVector output(num_all_latents_m);
-        
         // Create the worker
-        compute_B_parallel compute_B_parallel(transformed_input, output, num_all_latents_m, n, m, tau, Y_m);
-        
+        B_full B_full(transformed_input, output, num_all_latents_m, n, m, tau, Y_m);
         // Call the worker with parallelFor
-        parallelFor(0, num_all_latents_m, compute_B_parallel, 1, n_threads);
-        
+        parallelFor(0, num_all_latents_m, B_full, 1, n_threads);
         // Converto da Rcpp::NumericMatrix a arma::mat
         arma::rowvec B_m = arma::rowvec(output.begin(), output.length(), false);
         
         B[m] = B_m;
       }
     }
-  //AFFILIATION MODEL
-  } else if (model == 1) {
+  } 
+  
+  // AFFILIATION MODEL
+  else if (model == 1) {
+    arma::mat alpha_mat(2, M-1);
+    arma::mat beta_mat(2, M-1);
+    for (int m = 0; m < M-1; m++) {
+      if (Y[m] != R_NilValue) {
+        arma::uvec Y_m = Y[m];
+        arma::imat all_latents_m = all_latents[m];
+        int num_all_latents_m = all_latents_m.n_rows;
+        arma::uvec intra_or_inter = arma::zeros<arma::uvec>(num_all_latents_m);
+        double num_intra = 0, den_intra = 0;
+        double num_inter = 0, den_inter = 0;
+        
+        // Converto da arma::mat a Rcpp::NumericMatrix
+        NumericVector input = {0};
+        // Allocate the matrix we will return
+        NumericMatrix output(2, num_all_latents_m);
+        // Create the worker
+        B_aff B_aff(input, output, num_all_latents_m, n, m, tau, Y_m, all_latents_m, intra_or_inter, num_intra, den_intra, num_inter, den_inter);
+        // Call the worker with parallelFor
+        parallelFor(0, num_all_latents_m, B_aff, 1, n_threads);
+        // Converto da Rcpp::NumericMatrix a arma::mat
+        arma::mat alpha_beta = arma::mat(output.begin(), output.nrow(), output.ncol(), false);
+        
+        B[m] = alpha_beta;
+        alpha_mat.col(m) = alpha_beta.col(0);
+        beta_mat.col(m) = alpha_beta.col(1);
+      }
+    }
+    
+    arma::colvec alpha_vec = sum(alpha_mat, 1);
+    arma::colvec beta_vec = sum(beta_mat, 1);
+    double alpha = alpha_vec(0)/alpha_vec(1);
+    double beta = beta_vec(0)/beta_vec(1);
+    
+    for (int m = 0; m < M-1; m++) {
+      if (Y[m] != R_NilValue) {
+        arma::mat alpha_beta = B[m];
+        arma::rowvec alpha_beta_0 = alpha_beta.row(0);
+        arma::uvec ind = find(alpha_beta_0 == alpha_beta_0(0));
+        arma::rowvec B_m = arma::ones<arma::rowvec>(alpha_beta.n_cols);
+        B_m *= beta;
+        B_m(ind) *= alpha;
+        B[m] = B_m;
+      }
+    }
+  }
+  
+  // M-AFFILIATION MODEL
+  else if (model == 2) {
     for (int m = 0; m < M-1; m++) {
       if (Y[m] != R_NilValue) {
         arma::uvec Y_m = Y[m];
@@ -348,9 +481,9 @@ Rcpp::List compute_B (int n, int M, arma::mat tau, Rcpp::List Y, Rcpp::List all_
         // Allocate the matrix we will return
         NumericVector output(num_all_latents_m);
         // Create the worker
-        compute_B_parallel_AFF compute_B_parallel_AFF(transformed_input, output, num_all_latents_m, n, m, tau, Y_m, intra_or_inter, num_intra, den_intra, num_inter, den_inter);
+        B_aff_m B_aff_m(transformed_input, output, num_all_latents_m, n, m, tau, Y_m, intra_or_inter, num_intra, den_intra, num_inter, den_inter);
         // Call the worker with parallelFor
-        parallelFor(0, num_all_latents_m, compute_B_parallel_AFF, 1, n_threads);
+        parallelFor(0, num_all_latents_m, B_aff_m, 1, n_threads);
         // Converto da Rcpp::NumericMatrix a arma::mat
         arma::rowvec B_m = arma::rowvec(output.begin(), output.length(), false);
         
@@ -748,6 +881,11 @@ double compute_LogLik (int n, int M, int Q, arma::mat tau, arma::rowvec pi, Rcpp
   
   return LogLik;
 }
+
+
+
+
+
 
 
 
