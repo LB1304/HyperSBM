@@ -19,6 +19,9 @@ import_Hypergraph <- function(file_name, method = c("full", "edge")) {
     ind_h_edges_m <- which(hg$sizes == m)
     List_of_H.Edges[[m-1]] <- stringr::str_split_fixed(string = hg$h_edges[ind_h_edges_m], pattern = ",", n = m)
     List_of_H.Edges[[m-1]] <- apply(List_of_H.Edges[[m-1]], 2, as.integer)
+    if(is.vector(List_of_H.Edges[[m-1]])) {
+      List_of_H.Edges[[m-1]] <- t(as.matrix(List_of_H.Edges[[m-1]]))
+    }
     nodes <- sort(unique(c(nodes, unique(as.integer(List_of_H.Edges[[m-1]])))))
   }
   
