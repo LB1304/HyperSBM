@@ -14,8 +14,8 @@ HSBM(Hypergraph, Q, M_max = NULL,
   \item{Hypergraph}{An object of class HyperGraph, as imported by function \code{import_Hypergraph}}
   \item{Q}{An integer specifying the number of latent groups}
   \item{M_max}{Maximum size of hyperedges}
-  \item{start}{Type of starting value (0=random, 1=spectral clustering, 2=soft spectral clustering, 3=absolute spectral clustering)}
-  \item{model}{Model formulation (0=full HSBM model, 1=affiliation sub-model)}
+  \item{start}{Type of starting value (0 = random, 1 = spectral clustering, 2 = soft spectral clustering, 3 = absolute spectral clustering)}
+  \item{model}{Model formulation (0 = Full model, 1 = Affiliation submodel, 2 = m-Affiliation submodel)}
   \item{tol}{Tolerance level for convergence}
   \item{maxit_VEM}{Maximum number of iterations of the algorithm}
   \item{maxit_FP}{Maximum number of iterations of the fixed point algorithm}
