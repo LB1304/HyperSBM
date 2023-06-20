@@ -14,3 +14,13 @@ devtools::install_github("LB1304/HyperSBM")
 ```
 
 To download the .tar.gz file (for manual installation) use [this link](https://github.com/LB1304/HyperSBM/archive/main.tar.gz).
+
+
+You will find examples of use at [this link](https://github.com/LB1304/Hypergraph-Stochastic-Blockmodel).
+The main functions of the package are `sample_Hypergraph` (to generate data under the model), `import_Hypergraph` (to import your dataset), and `HSBM` (to estimate the model parameters). More on the options is accessible with the commands
+
+```r
+help("sample_Hypergraph")
+help("import_Hypergraph")
+help("HSBM")
+```
