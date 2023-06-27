@@ -14,7 +14,7 @@ HSBM(Hypergraph, Q, M_max = NULL,
   \item{Hypergraph}{An object of class HyperGraph, as imported by function \code{import_Hypergraph}}
   \item{Q}{An integer specifying the number of latent groups}
   \item{M_max}{Maximum size of hyperedges}
-  \item{start}{Type of starting value (0 = random, 1 = spectral clustering, 2 = soft spectral clustering, 3 = absolute spectral clustering)}
+  \item{start}{Type of starting value (0 = Random, 1 = Spectral clustering, 2 = Soft spectral clustering, 3 = Absolute spectral clustering)}
   \item{model}{Model formulation (0 = Full model, 1 = Affiliation submodel, 2 = m-Affiliation submodel)}
   \item{tol}{Tolerance level for convergence}
   \item{maxit_VEM}{Maximum number of iterations of the algorithm}
@@ -48,7 +48,7 @@ HSBM(Hypergraph, Q, M_max = NULL,
   est <- HSBM(Hypergraph = HG, Q = 2, tol = 1e-6, maxit_VEM = 100, maxit_FP = 100)
   ## Estimation of the HSBM with 2 latent groups, random initialization and full model (parallelized version with 30 cores)
   est <- HSBM(Hypergraph = HG, Q = 2, tol = 1e-6, maxit_VEM = 100, maxit_FP = 100, n_threads = 30)
-  ## Estimation of the HSBM with 2 latent groups, random initialization and affiliation model
+  ## Estimation of the HSBM with 2 latent groups, random initialization and m-affiliation model
   est <- HSBM(Hypergraph = HG, Q = 2, start = 0, model = 2, tol = 1e-6, maxit_VEM = 100, maxit_FP = 100)
   ## Estimation of the HSBM with 2 latent groups, soft spectral clustering initialization and full model
   est <- HSBM(Hypergraph = HG, Q = 2, start = 2, model = 0, tol = 1e-6, maxit_VEM = 100, maxit_FP = 100)
