@@ -287,9 +287,11 @@ struct B_aff : public Worker {
       if (intra_or_inter[xx] == 0) {
         B_output(0, xx) = num_intra;
         B_output(1, xx) = den_intra;
+        B_output(2, xx) = 0;
       } else {
         B_output(0, xx) = num_inter;
         B_output(1, xx) = den_inter;
+        B_output(2, xx) = 1;
       }
     }
     
@@ -419,8 +421,10 @@ Rcpp::List compute_B (int n, int M, arma::mat tau, Rcpp::List Y, Rcpp::List all_
   
   // AFFILIATION MODEL
   else if (model == 1) {
-    arma::mat alpha_mat(2, M-1);
-    arma::mat beta_mat(2, M-1);
+    double alpha_N = 0.0;
+    double alpha_D = 0.0;
+    double beta_N = 0.0;
+    double beta_D = 0.0;
     for (int m = 0; m < M-1; m++) {
       if (Y[m] != R_NilValue) {
         arma::uvec Y_m = Y[m];
@@ -433,34 +437,34 @@ Rcpp::List compute_B (int n, int M, arma::mat tau, Rcpp::List Y, Rcpp::List all_
         // Converto da arma::mat a Rcpp::NumericMatrix
         NumericVector input = {0};
         // Allocate the matrix we will return
-        NumericMatrix output(2, num_all_latents_m);
+        NumericMatrix output(3, num_all_latents_m);
         // Create the worker
         B_aff B_aff(input, output, num_all_latents_m, n, m, tau, Y_m, all_latents_m, intra_or_inter, num_intra, den_intra, num_inter, den_inter);
         // Call the worker with parallelFor
         parallelFor(0, num_all_latents_m, B_aff, 1, n_threads);
         // Converto da Rcpp::NumericMatrix a arma::mat
         arma::mat alpha_beta = arma::mat(output.begin(), output.nrow(), output.ncol(), false);
+        B[m] = alpha_beta.row(2);
+        arma::uvec alpha_ind = arma::find(alpha_beta.row(2) == 0);
+        arma::uvec beta_ind = arma::find(alpha_beta.row(2) == 1);
+        arma::mat alpha_beta_N = alpha_beta.row(0);
+        arma::mat alpha_beta_D = alpha_beta.row(1);
         
-        B[m] = alpha_beta;
-        alpha_mat.col(m) = alpha_beta.col(0);
-        beta_mat.col(m) = alpha_beta.col(1);
+        alpha_N += arma::accu(alpha_beta_N.cols(alpha_ind));
+        alpha_D += arma::accu(alpha_beta_D.cols(alpha_ind));
+        beta_N += arma::accu(alpha_beta_N.cols(beta_ind));
+        beta_D += arma::accu(alpha_beta_D.cols(beta_ind));
+        
       }
     }
-    
-    arma::colvec alpha_vec = sum(alpha_mat, 1);
-    arma::colvec beta_vec = sum(beta_mat, 1);
-    double alpha = alpha_vec(0)/alpha_vec(1);
-    double beta = beta_vec(0)/beta_vec(1);
-    
     for (int m = 0; m < M-1; m++) {
       if (Y[m] != R_NilValue) {
-        arma::mat alpha_beta = B[m];
-        arma::rowvec alpha_beta_0 = alpha_beta.row(0);
-        arma::uvec ind = find(alpha_beta_0 == alpha_beta_0(0));
-        arma::rowvec B_m = arma::ones<arma::rowvec>(alpha_beta.n_cols);
-        B_m *= beta;
-        B_m(ind) *= alpha;
-        B[m] = B_m;
+        arma::rowvec alpha_beta = B[m];
+        arma::uvec alpha_ind = arma::find(alpha_beta == 0);
+        arma::uvec beta_ind = arma::find(alpha_beta == 1);
+        alpha_beta.cols(alpha_ind) += alpha_N/alpha_D;
+        alpha_beta.cols(beta_ind) *= beta_N/beta_D;
+        B[m] = alpha_beta;
       }
     }
   }
@@ -557,7 +561,9 @@ double compute_ELBO (int M, arma::mat tau, arma::rowvec pi, Rcpp::List Y, Rcpp::
             arma::uvec latent_perm_as_ind = arma::conv_to<arma::uvec>::from(latent_perm);
             arma::uvec edge_as_ind = arma::conv_to<arma::uvec>::from(edge);
             arma::vec tau_elems = tau.elem((latent_perm_as_ind - 1) * tau.n_rows + (edge_as_ind - 1));
-            double new_Tau = arma::prod(tau_elems);
+            // double new_Tau = arma::prod(tau_elems);
+            double new_Tau = exp(arma::accu(log(tau_elems)));
+            //
             tau_prod += new_Tau;
             
             arma::rowvec new_latent_perm = next_permutation(latent_perm);
@@ -651,7 +657,9 @@ struct compute_tau_parallel : public Worker {
               arma::uvec latent_perm_as_ind = arma::conv_to<arma::uvec>::from(latent_perm);
               arma::uvec edge_as_ind = arma::conv_to<arma::uvec>::from(edge);
               arma::vec tau_elems = tau_old_conv.elem((latent_perm_as_ind - 1) * tau_old_conv.n_rows + (edge_as_ind - 1));
-              double new_Tau = arma::prod(tau_elems);
+              // double new_Tau = arma::prod(tau_elems);
+              double new_Tau = exp(arma::accu(log(tau_elems)));
+              //
               tau_prod += new_Tau;
               
               arma::rowvec new_latent_perm = next_permutation(latent_perm);
@@ -706,6 +714,7 @@ arma::mat compute_tau_par (int M, arma::mat tau_prec, arma::rowvec pi, Rcpp::Lis
     }
   }
   
+  
   for (int i = 0; i < n; i++) {   //MODIFICA
     double tau_i_max = arma::max(tau.row(i));
     for (int q = 0; q < Q; q++) {   //MODIFICA
@@ -716,6 +725,8 @@ arma::mat compute_tau_par (int M, arma::mat tau_prec, arma::rowvec pi, Rcpp::Lis
     tau_sum.row(i).fill(1/rsum);   //MODIFICA
     tau %= tau_sum;   //MODIFICA
   }   //MODIFICA
+  
+  tau.clamp(1e-12, 1-1e-12);
   
   return tau;
 }
@@ -881,11 +892,6 @@ double compute_LogLik (int n, int M, int Q, arma::mat tau, arma::rowvec pi, Rcpp
   
   return LogLik;
 }
-
-
-
-
-
 
 
 
