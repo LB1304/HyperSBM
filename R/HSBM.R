@@ -72,7 +72,7 @@ HSBM <- function (Hypergraph, Q, M_max = NULL, start = 0, model = 0, tol = 1e-6,
     X <- as.matrix(eigs$vectors[, ind_eig])
     X <- X/sqrt(apply(X, 1, function(x) norm(x, "2")))
     X[which(is.nan(X))] <- 0
-    km <- kmeans(x = X, centers = Q)
+    km <- kmeans(x = X, centers = Q, nstart = 100)
     tau_vec <- km$cluster
     tau_init <- matrix(0, nrow = n, ncol = Q)
     for (i in 1:n) {
