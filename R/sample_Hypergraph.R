@@ -15,18 +15,12 @@ sample_Hypergraph <- function(n, M, Q, pi, alpha, beta, file_name) {
   sink(paste0(file_name, ".txt"))
   for (m in 1:length(M)) {
     H.Edges_m <- RcppAlgos::comboGeneral(v = n, m = M[m], repetition = FALSE)
-    for (i in 1:nrow(H.Edges_m)) {
-      proposed_H.Edge <- H.Edges_m[i, ]
-      blocks <- unique(nodes_in_blocks[proposed_H.Edge])
-      prob <- ifelse(length(blocks) == 1, alpha[m], beta[m])
-      exist_H.Edge <- rbinom(n = 1, size = 1, prob = prob)
-      if (exist_H.Edge == 1) {
-        cat(paste(proposed_H.Edge, collapse = ","), append = TRUE, sep = "\n")
-      }
-    }
+    prob <- alpha[m] * apply(H.Edges_m, 1, function(x)length(unique(nodes_in_blocks[x])))
+    prob[prob > alpha[m]] <- beta[m]
+    exist_H.Edges <- rbinom(prob, 1, prob)
+    H.Edges_m <- H.Edges_m[-which(exist_H.Edges == 0), ]
+    apply(H.Edges_m, 1, function(x) cat(paste(x, collapse = ","), append = TRUE, sep = "\n"))
   }
   sink()
-
+  
 }
-
-
