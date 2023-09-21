@@ -18,6 +18,9 @@ sample_Hypergraph(n, M, Q, pi, alpha, beta, file_name)
 }
 \details{
   Hypergraphs are sampled under the Aff-m sub-model.
+  For each hyperedge size M[i]:
+  - alpha[m] represents the probability that M[i] nodes belonging to the same latent block are connected into an hyperedge;
+  - beta[m] represents the probability that M[i] nodes belonging to two or more different latent blocks are connected into an hyperedge.
   
   This function has no output but saves two files to the current directory: the "file_name.txt" file, containing the hyperedges, and the "file_name_info.RData" file, containing the vector with the true latent group of each node.
   In the text file, each line represents a different hyperedge, and the nodes in a hyperedge are separated by a comma (e.g. 2, 6, 34).
