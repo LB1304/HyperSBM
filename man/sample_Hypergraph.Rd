@@ -13,7 +13,7 @@ sample_Hypergraph(n, M, Q, pi, alpha, beta, file_name)
   \item{Q}{Number of latent groups}
   \item{pi}{Vector of group probabilities}
   \item{alpha}{Vector of connection probabilities of nodes belonging to the same latent group (same length as M).}
-  \item{beta}{Vector of connection probabilities of nodes belonging to at least two different latent groups (same length as M). }
+  \item{beta}{Vector of connection probabilities of nodes belonging to at least two different latent groups (same length as M).}
   \item{file_name}{A string with the name of the hypergraph}
 }
 \details{
